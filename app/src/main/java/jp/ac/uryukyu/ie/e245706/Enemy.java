@@ -2,6 +2,7 @@ package jp.ac.uryukyu.ie.e245706;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.awt.image.BufferedImage;
 
 public class Enemy {
     private int x, y; // 敵の位置
@@ -9,15 +10,16 @@ public class Enemy {
     private int width, height; // 敵のサイズ
     private boolean active = true; // 敵が画面内にいるかどうか
     private final EnemyBulletManager bulletManager = new EnemyBulletManager(); // 敵のビーム管理
-    private final int radius = 10; // 円の半径
+    private BufferedImage sprite; // 敵の画像
 
 
-    public Enemy(int x, int y, int speed, int width, int height) {
+    public Enemy(int x, int y, int speed, int width, int height ,SpriteManager spriteManager) {
         this.x = x;
         this.y = y;
         this.speed = speed;
         this.width = width;
         this.height = height;
+        this.sprite = spriteManager.getEnemy();
     }
 
     public void update(Player player) {
@@ -35,17 +37,25 @@ public class Enemy {
     }
 
     public void draw(Graphics g) {
-        g.setColor(Color.GREEN);
-        g.fillOval((int) x - radius, (int) y - radius, radius * 2, radius * 2);
-        bulletManager.draw(g); // 敵のビームを描画
+        if (sprite != null) {
+            g.drawImage(sprite, x, y, width, height,null); // 画像を描画
+        } else {
+            g.setColor(Color.RED); // 画像がない場合の代替描画
+            g.fillRect(x, y, 50, 50);
+        }
     }
 
     public boolean isActive() {
         return active;
     }
 
+
     public Rectangle getBounds() {
-        return new Rectangle(x, y, width, height);
+        if (sprite != null) {
+            return new Rectangle(x, y, sprite.getWidth() / 2, sprite.getHeight() / 2); // 画像サイズに基づく矩形
+        } else {
+            return new Rectangle(x, y, 50, 50); // デフォルトの矩形
+        }
     }
 
     public void setActive(boolean active) {

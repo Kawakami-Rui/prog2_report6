@@ -9,6 +9,11 @@ public class EnemyManager {
     private final ArrayList<EnemyBullet> enemyBullets = new ArrayList<>(); // 敵のビームを一括管理
     private final Random random = new Random();
     private int spawnCooldown = 0; // 敵生成のクールダウンタイマー
+    private final SpriteManager spriteManager;
+
+    public EnemyManager(SpriteManager spriteManager) {
+        this.spriteManager = spriteManager;
+    }
 
     public void update(Player player) {
         // 敵を生成する間隔を制御
@@ -54,6 +59,6 @@ public class EnemyManager {
     private void spawnEnemy() {
         int x = random.nextInt(Player.WINDOW_WIDTH - 50); // ランダムなX座標
         int speed = random.nextInt(3) + 1; // ランダムな速度（1～3）
-        enemies.add(new Enemy(x, -50, speed, 50, 50)); // 新しい敵をリストに追加
+        enemies.add(new Enemy(x, -50, speed, 50, 50, spriteManager)); // 新しい敵をリストに追加
     }
 }

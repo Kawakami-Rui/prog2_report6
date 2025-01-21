@@ -6,15 +6,17 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class GamePanel extends JPanel implements KeyListener {
-    private final Player player; //プレイヤーを管理するフィールドを追加
+    private final Player player; // プレイヤーを管理するフィールドを追加
     private final EnemyManager enemyManager; // 敵を管理するフィールドを追加
+    private final SpriteManager spriteManager; // スプライト管理を追加
 
     public GamePanel() {
+        this.spriteManager = new SpriteManager(); // SpriteManager を生成
         this.player = new Player(Player.WINDOW_WIDTH / 2, Player.WINDOW_HEIGHT - 100);
-        this.enemyManager = new EnemyManager();
+        this.enemyManager = new EnemyManager(spriteManager); // EnemyManager に SpriteManager を渡す
+
         addKeyListener(this);
         setFocusable(true);
-    
     }
 
     @Override
