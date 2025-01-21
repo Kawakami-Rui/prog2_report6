@@ -2,6 +2,7 @@ package jp.ac.uryukyu.ie.e245706;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.awt.event.KeyEvent;
 
 public class Player {
@@ -31,11 +32,11 @@ public class Player {
         }
     }
 
-    public void update() {
+    public void update(ArrayList<Enemy> enemies) {
         updatePosition();
         restrictWithinBounds();
         updateSprite();
-        bulletManager.update(); // ビームの更新
+        bulletManager.update(enemies); // ビームの更新
     }
 
     public void draw(Graphics g) {
@@ -52,6 +53,10 @@ public class Player {
 
     public void keyReleased(KeyEvent e) {
         inputHandler.keyReleased(e.getKeyCode());
+    }
+
+    public BulletManager getBulletManager() {
+        return bulletManager;
     }
 
     private void updatePosition() {

@@ -12,13 +12,24 @@ public class BulletManager {
     }
 
     // ビームを更新
-    public void update() {
+    public void update(ArrayList<Enemy> enemies) {
         bullets.removeIf(bullet -> {
             bullet.update();
-            return !bullet.isActive(); // 非アクティブな発射物を削除
+            if (!bullet.isActive()) {
+                return true; // 非アクティブなビームを削除
+            }
+
+            // 衝突判定
+            for (Enemy enemy : enemies) {
+                if (bullet.getBounds().intersects(enemy.getBounds())) {
+                    bullet.setActive(false); // ビームを非アクティブに
+                    enemy.setActive(false);  // 敵を非アクティブに
+                    return true; // ビームを削除
+                }
+            }
+            return false;
         });
     }
-
     // ビームを描画
     public void draw(Graphics g) {
         for (Bullet bullet : bullets) {

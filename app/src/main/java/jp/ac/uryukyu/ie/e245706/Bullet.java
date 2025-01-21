@@ -8,6 +8,14 @@ public class Bullet {
     protected int width, height; // 発射物のサイズ
     protected boolean active = true; // 発射物が画面内にあるかどうか
 
+    public Rectangle getBounds() {
+        return new Rectangle(x, y, width, height);
+    }
+    
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
     public Bullet(int x, int y, int speed, int width, int height) {
         this.x = x;
         this.y = y;
