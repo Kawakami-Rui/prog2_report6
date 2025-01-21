@@ -21,9 +21,9 @@ public class GamePanel extends JPanel implements ActionListener {
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                player.keyPressed(e, bullets);
+                player.keyPressed(e);
             }
-
+        
             @Override
             public void keyReleased(KeyEvent e) {
                 player.keyReleased(e);

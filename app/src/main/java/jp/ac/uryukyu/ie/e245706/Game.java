@@ -6,7 +6,7 @@ public class Game {
     public static void main(String[] args) {
         JFrame frame = new JFrame("Simple Shooting Game");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 600);
+        frame.setSize(500, 900);
 
         GamePanel panel = new GamePanel();
         frame.add(panel);
