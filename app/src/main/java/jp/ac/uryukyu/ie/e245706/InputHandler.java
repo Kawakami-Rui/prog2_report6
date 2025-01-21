@@ -32,4 +32,13 @@ public class InputHandler {
     public boolean isMoving() {
         return up || down || left || right;
     }
+
+    public void reset() {
+        // すべてのキー入力状態をリセット
+        up = false;
+        down = false;
+        left = false;
+        right = false;
+        firing = false;
+    }
 }

@@ -129,4 +129,12 @@ public class Player {
     private void fireBullet() {
         bulletManager.fire(x + 32 - 2, y); // 中央からビームを発射
     }
+
+    public void reset() {
+        // プレイヤーの位置を初期値に戻す
+        this.x = WINDOW_WIDTH / 2;
+        this.y = WINDOW_HEIGHT - 100;
+        bulletManager.clear(); // 発射した弾をクリア
+        inputHandler.reset();  // 入力状態をリセット
+    }
 }

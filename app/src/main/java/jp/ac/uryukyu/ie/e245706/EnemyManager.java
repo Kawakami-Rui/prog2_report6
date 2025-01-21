@@ -61,4 +61,9 @@ public class EnemyManager {
         int speed = random.nextInt(3) + 1; // ランダムな速度（1～3）
         enemies.add(new Enemy(x, -50, speed, 50, 50, spriteManager)); // 新しい敵をリストに追加
     }
+
+    public void reset() {
+        enemies.clear(); // 敵をクリア
+        enemyBullets.clear(); // 敵のビームをクリア
+    }
 }

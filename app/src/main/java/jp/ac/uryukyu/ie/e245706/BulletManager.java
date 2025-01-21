@@ -36,4 +36,13 @@ public class BulletManager {
             bullet.draw(g);
         }
     }
+
+    // ビームをすべて削除
+    public void clear() {
+        bullets.clear();
+    }
+
+    public ArrayList<Bullet> getBullets() {
+        return bullets;
+    }
 }
