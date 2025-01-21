@@ -2,15 +2,16 @@ package jp.ac.uryukyu.ie.e245706;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.event.KeyEvent;
 
 public class Player {
     private int x, y; // プレイヤーの位置
     private int speed = 6; // 移動速度
-    private boolean up, down, left, right; // 移動フラグ
     private BufferedImage sprite; // 現在の画像
-    private final SpriteManager spriteManager;
+    private final SpriteManager spriteManager; // スプライト管理
+    private final BulletManager bulletManager; // ビーム管理
+    private final InputHandler inputHandler; // 入力管理
 
-    // ウィンドウサイズの定数
     public static final int WINDOW_WIDTH = 500;
     public static final int WINDOW_HEIGHT = 900;
 
@@ -18,8 +19,10 @@ public class Player {
         this.x = x;
         this.y = y;
 
-        // SpriteManagerで画像を管理
+        // 管理クラスの初期化
         spriteManager = new SpriteManager();
+        bulletManager = new BulletManager();
+        inputHandler = new InputHandler();
 
         // 初期状態は直進画像
         sprite = spriteManager.getStraight();
@@ -28,98 +31,85 @@ public class Player {
         }
     }
 
-// プレイヤーの動きを更新
-public void update() {
-    boolean moved = false; // 動きが発生したかどうかのフラグ
-
-    double diagonalSpeed = speed / Math.sqrt(2); // 斜め移動時の速度
-
-    if (up && left) {
-        y -= diagonalSpeed;
-        x -= diagonalSpeed;
-        moved = true;
-    } else if (up && right) {
-        y -= diagonalSpeed;
-        x += diagonalSpeed;
-        moved = true;
-    } else if (down && left) {
-        y += diagonalSpeed;
-        x -= diagonalSpeed;
-        moved = true;
-    } else if (down && right) {
-        y += diagonalSpeed;
-        x += diagonalSpeed;
-        moved = true;
-    } else {
-        if (up) {
-            y -= speed;
-            moved = true;
-        }
-        if (down) {
-            y += speed;
-            moved = true;
-        }
-        if (left) {
-            x -= speed;
-            moved = true;
-        }
-        if (right) {
-            x += speed;
-            moved = true;
-        }
+    public void update() {
+        updatePosition();
+        restrictWithinBounds();
+        updateSprite();
+        bulletManager.update(); // ビームの更新
     }
 
-    // 画面外に出ないように制限
-    if (x < 0) x = 0;
-    if (y < 0) y = 0;
-    if (x > WINDOW_WIDTH - 64) x = WINDOW_WIDTH - 64; // プレイヤーの幅を考慮
-    if (y > WINDOW_HEIGHT - 64) y = WINDOW_HEIGHT - 64; // プレイヤーの高さを考慮
-
-    // 画像の切り替え（移動中または静止中の場合）
-    if (moved) {
-        if (left && right) {
-            sprite = spriteManager.getStraight(); // 左右同時押しなら直進画像
-        } else if (left) {
-            sprite = spriteManager.getLeft(); // 左移動中
-        } else if (right) {
-            sprite = spriteManager.getRight(); // 右移動中
-        } else {
-            sprite = spriteManager.getStraight(); // 他の場合は直進画像
-        }
-    } else {
-        // 移動していない場合、直進画像に戻す
-        sprite = spriteManager.getStraight();
-    }
-}
-
-    // プレイヤーを描画
     public void draw(Graphics g) {
+        drawPlayer(g);
+        bulletManager.draw(g); // ビームの描画
+    }
+
+    public void keyPressed(KeyEvent e) {
+        inputHandler.keyPressed(e.getKeyCode());
+        if (inputHandler.isFiring()) {
+            fireBullet();
+        }
+    }
+
+    public void keyReleased(KeyEvent e) {
+        inputHandler.keyReleased(e.getKeyCode());
+    }
+
+    private void updatePosition() {
+        double diagonalSpeed = speed / Math.sqrt(2);
+
+        if (inputHandler.isUp() && inputHandler.isLeft()) {
+            y -= diagonalSpeed;
+            x -= diagonalSpeed;
+        } else if (inputHandler.isUp() && inputHandler.isRight()) {
+            y -= diagonalSpeed;
+            x += diagonalSpeed;
+        } else if (inputHandler.isDown() && inputHandler.isLeft()) {
+            y += diagonalSpeed;
+            x -= diagonalSpeed;
+        } else if (inputHandler.isDown() && inputHandler.isRight()) {
+            y += diagonalSpeed;
+            x += diagonalSpeed;
+        } else {
+            if (inputHandler.isUp()) y -= speed;
+            if (inputHandler.isDown()) y += speed;
+            if (inputHandler.isLeft()) x -= speed;
+            if (inputHandler.isRight()) x += speed;
+        }
+    }
+
+    private void restrictWithinBounds() {
+        if (x < 0) x = 0;
+        if (y < 0) y = 0;
+        if (x > WINDOW_WIDTH - 64) x = WINDOW_WIDTH - 64;
+        if (y > WINDOW_HEIGHT - 64) y = WINDOW_HEIGHT - 64;
+    }
+
+    private void updateSprite() {
+        if (inputHandler.isMoving()) {
+            if (inputHandler.isLeft() && inputHandler.isRight()) {
+                sprite = spriteManager.getStraight();
+            } else if (inputHandler.isLeft()) {
+                sprite = spriteManager.getLeft();
+            } else if (inputHandler.isRight()) {
+                sprite = spriteManager.getRight();
+            } else {
+                sprite = spriteManager.getStraight();
+            }
+        } else {
+            sprite = spriteManager.getStraight();
+        }
+    }
+
+    private void drawPlayer(Graphics g) {
         if (sprite != null) {
             g.drawImage(sprite, x, y, 64, 64, null);
         } else {
-            System.err.println("Warning: sprite is null. Drawing placeholder.");
             g.setColor(Color.BLUE);
             g.fillRect(x, y, 50, 50);
         }
     }
 
-    // キーが押されたときの動作
-    public void keyPressed(java.awt.event.KeyEvent e) {
-        int key = e.getKeyCode();
-
-        if (key == java.awt.event.KeyEvent.VK_W || key == java.awt.event.KeyEvent.VK_UP) up = true;
-        if (key == java.awt.event.KeyEvent.VK_S || key == java.awt.event.KeyEvent.VK_DOWN) down = true;
-        if (key == java.awt.event.KeyEvent.VK_A || key == java.awt.event.KeyEvent.VK_LEFT) left = true;
-        if (key == java.awt.event.KeyEvent.VK_D || key == java.awt.event.KeyEvent.VK_RIGHT) right = true;
-    }
-
-    // キーが離されたときの動作
-    public void keyReleased(java.awt.event.KeyEvent e) {
-        int key = e.getKeyCode();
-
-        if (key == java.awt.event.KeyEvent.VK_W || key == java.awt.event.KeyEvent.VK_UP) up = false;
-        if (key == java.awt.event.KeyEvent.VK_S || key == java.awt.event.KeyEvent.VK_DOWN) down = false;
-        if (key == java.awt.event.KeyEvent.VK_A || key == java.awt.event.KeyEvent.VK_LEFT) left = false;
-        if (key == java.awt.event.KeyEvent.VK_D || key == java.awt.event.KeyEvent.VK_RIGHT) right = false;
+    private void fireBullet() {
+        bulletManager.fire(x + 32 - 2, y); // 中央からビームを発射
     }
 }
