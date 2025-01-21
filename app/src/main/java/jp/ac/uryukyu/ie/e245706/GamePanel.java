@@ -26,11 +26,29 @@ public class GamePanel extends JPanel implements KeyListener {
 
     public void startGame() {
         Timer timer = new Timer(16, e -> {
-            player.update(enemyManager.getEnemies()); // プレイヤーを更新
+            enemyManager.update(player); // 敵を更新
+            player.update(enemyManager.getEnemies()); // 敵リストを渡してプレイヤーを更新
+    
+            // プレイヤーと敵のビームの衝突判定
+            for (Enemy enemy : enemyManager.getEnemies()) {
+                for (EnemyBullet bullet : enemy.getBullets()) {
+                    if (bullet.getBounds().intersects(player.getBounds())) {
+                        // ゲーム終了処理
+                        System.out.println("Game Over! Player hit by enemy bullet.");
+                        ((Timer) e.getSource()).stop(); // ゲームループ停止
+                        return;
+                    }
+                }
+    
+                // プレイヤーが敵と衝突
+                if (enemy.getBounds().intersects(player.getBounds())) {
+                    System.out.println("Game Over! Player hit by enemy.");
+                    ((Timer) e.getSource()).stop();
+                    return;
+                }
+            }
+    
             repaint(); // 描画を更新
-            enemyManager.update();
-            player.getBulletManager().update(enemyManager.getEnemies()); // 敵リストを渡す
-            repaint();
         });
         timer.start();
     }

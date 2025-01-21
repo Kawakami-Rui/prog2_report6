@@ -59,6 +59,18 @@ public class Player {
         return bulletManager;
     }
 
+    public Rectangle getBounds() {
+        return new Rectangle(x, y, 50, 50); // プレイヤーの矩形範囲を返す
+    }
+
+    public int getX() {
+        return x;
+    }
+    
+    public int getY() {
+        return y;
+    }
+
     private void updatePosition() {
         double diagonalSpeed = speed / Math.sqrt(2);
 
